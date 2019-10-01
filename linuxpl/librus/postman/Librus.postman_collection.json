@@ -1,0 +1,509 @@
+{
+	"info": {
+		"_postman_id": "9fd1981a-c319-4762-a4fa-1c97266defdf",
+		"name": "Librus",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Librus session id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "19a61590-d6f8-45f8-836a-ea1c8d812cf7",
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Got librus session id cookie\", function(){",
+							"    pm.expect(pm.cookies.has('DZIENNIKSID')).to.be.true;",
+							"});",
+							"",
+							"postman.setEnvironmentVariable(\"librusSessionId\", pm.cookies.get('DZIENNIKSID'));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.librus.pl/OAuth/Authorization?client_id=46&response_type=code&scope=mydata",
+					"protocol": "https",
+					"host": [
+						"api",
+						"librus",
+						"pl"
+					],
+					"path": [
+						"OAuth",
+						"Authorization"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "46"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "scope",
+							"value": "mydata"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ask for captcha",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6638cfec-97f1-488a-badf-8aa7e8e10f3a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Got valid response\", function () {",
+							"    pm.response.to.be.json;",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"is_needed\");",
+							"});",
+							"",
+							"pm.test(\"No need for captcha\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.is_needed).to.equal(false);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "097c0e35-9fd7-476e-b44d-996c14d828f5",
+						"exec": [
+							"pm.test(\"librusSessionId is set\", function () {",
+							"    pm.expect(pm.environment.has(\"librusSessionId\")).to.equal(true);",
+							"});",
+							"",
+							"pm.test(\"login is set\", function () {",
+							"    pm.expect(pm.environment.has(\"login\")).to.equal(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "DZIENNIKSID={{librusSessionId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{login}}",
+							"type": "text"
+						},
+						{
+							"key": "is_needed",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://api.librus.pl/OAuth/Captcha",
+					"protocol": "https",
+					"host": [
+						"api",
+						"librus",
+						"pl"
+					],
+					"path": [
+						"OAuth",
+						"Captcha"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bd84c63b-4961-4bd0-b291-4d2be96204bd",
+						"exec": [
+							"pm.test(\"librusSessionId is set\", function () {",
+							"    pm.expect(pm.environment.has(\"librusSessionId\")).to.equal(true);",
+							"});",
+							"",
+							"pm.test(\"login is set\", function () {",
+							"    pm.expect(pm.environment.has(\"login\")).to.equal(true);",
+							"});",
+							"",
+							"pm.test(\"password is set\", function () {",
+							"    pm.expect(pm.environment.has(\"password\")).to.equal(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "79b4e5c3-1ea0-4aa9-8a46-60a078d9555e",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Got valid response\", function () {",
+							"    pm.response.to.be.json;",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"status\");",
+							"});",
+							"",
+							"pm.test(\"Got status 'ok'\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.equal(\"ok\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded; charset=UTF-8",
+						"type": "text"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors",
+						"type": "text"
+					},
+					{
+						"key": "Origin",
+						"value": "https://api.librus.pl",
+						"type": "text"
+					},
+					{
+						"key": "Referer",
+						"value": "https://api.librus.pl/OAuth/Authorization?client_id=46",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36",
+						"type": "text"
+					},
+					{
+						"key": "X-Requested-With",
+						"value": "XMLHttpRequest",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json, text/javascript, */*; q=0.01",
+						"type": "text"
+					},
+					{
+						"key": "Cookie",
+						"value": "DZIENNIKSID={{librusSessionId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "action",
+							"value": "login",
+							"type": "text"
+						},
+						{
+							"key": "login",
+							"value": "{{login}}",
+							"type": "text"
+						},
+						{
+							"key": "pass",
+							"value": "{{password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://api.librus.pl/OAuth/Authorization?client_id=46",
+					"protocol": "https",
+					"host": [
+						"api",
+						"librus",
+						"pl"
+					],
+					"path": [
+						"OAuth",
+						"Authorization"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "46"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get authorization code",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "330baf9d-b977-4be1-82fe-f1b2fa25982b",
+						"exec": [
+							"pm.test(\"librusSessionId is set\", function () {",
+							"    pm.expect(pm.environment.has(\"librusSessionId\")).to.equal(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4890ed0e-aea5-467b-84ad-e11071b778ee",
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Got location header\", function () {",
+							"    pm.response.to.have.header(\"location\");",
+							"});",
+							"",
+							"locationString = pm.response.headers.get(\"Location\");",
+							"console.log(locationString);",
+							"",
+							"var sdk = require('postman-collection');",
+							"locationUrl = new sdk.Url(locationString);",
+							"",
+							"console.log(locationUrl);",
+							"",
+							"console.log(locationUrl.query.get('code'));",
+							"",
+							"pm.test(\"Got 'code' parameter\", function () {",
+							"    pm.expect(locationUrl.query.has(\"code\")).to.be.true;",
+							"});",
+							"",
+							"postman.setEnvironmentVariable(\"authorizationCode\", locationUrl.query.get('code'));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "DZIENNIKSID={{librusSessionId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.librus.pl/OAuth/Authorization/Grant?client_id=46",
+					"protocol": "https",
+					"host": [
+						"api",
+						"librus",
+						"pl"
+					],
+					"path": [
+						"OAuth",
+						"Authorization",
+						"Grant"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "46"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Synergia session id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5eef8812-4b61-4993-ab30-31a96e6be399",
+						"exec": [
+							"pm.test(\"authorizationCode is set\", function () {",
+							"    pm.expect(pm.environment.has(\"authorizationCode\")).to.equal(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ee2bd12b-22fc-46ec-84c2-1b3ca15ce5e4",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Got Synergia session id cookie\", function(){",
+							"    pm.expect(pm.cookies.has('DZIENNIKSID')).to.be.true;",
+							"});",
+							"",
+							"postman.setEnvironmentVariable(\"synergiaSessionId\", pm.cookies.get('DZIENNIKSID'));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://synergia.librus.pl/loguj/portalRodzina?code={{authorizationCode}}",
+					"protocol": "https",
+					"host": [
+						"synergia",
+						"librus",
+						"pl"
+					],
+					"path": [
+						"loguj",
+						"portalRodzina"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "{{authorizationCode}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get lessons plan",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6d6548bd-043e-4274-88f1-36b9cc6c73a6",
+						"exec": [
+							"pm.test(\"synergiaSessionId is set\", function () {",
+							"    pm.expect(pm.environment.has(\"synergiaSessionId\")).to.equal(true);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "dc872d8b-5d64-4ebd-957d-bb48404ef966",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body contains string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Plan lekcji\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "DZIENNIKSID={{synergiaSessionId}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://synergia.librus.pl/przegladaj_plan_lekcji",
+					"protocol": "https",
+					"host": [
+						"synergia",
+						"librus",
+						"pl"
+					],
+					"path": [
+						"przegladaj_plan_lekcji"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
