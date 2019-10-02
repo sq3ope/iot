@@ -63,7 +63,7 @@
 		}
 
 		$json = json_decode($http_response, true);
-		if (json_last_error() != JSON_ERROR_NONE) {
+		if (!is_array($json)) {
 			die("[ERROR] response is not json");
 		}
 
