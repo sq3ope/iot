@@ -1,0 +1,4 @@
+<?php
+	$config['librus_login'] = 'foo';
+	$config['librus_password'] = 'bar';
+?>
