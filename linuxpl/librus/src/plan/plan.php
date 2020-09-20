@@ -165,6 +165,12 @@
 		curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt ( $ch, CURLOPT_TIMEOUT, $timeout );
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Cookie: DZIENNIKSID=$synergia_session_id"));
+
+		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($_POST));
+		}
+
 		$http_response = curl_exec($ch);
 		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 
@@ -192,5 +198,7 @@
 	$schedule = get_schedule($synergia_session_id);
 	$schedule = str_replace('src="/', 'src="https://synergia.librus.pl/', $schedule);
 	$schedule = str_replace('href="/', 'href="https://synergia.librus.pl/', $schedule);
+	$schedule = str_replace('"/przegladaj_plan_lekcji"', "\"http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]\"", $schedule);
+
 	print $schedule;
 ?>
