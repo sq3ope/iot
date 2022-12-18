@@ -18,7 +18,7 @@
 		$http_response = curl_exec($ch);
 		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 
-		#print $http_response;
+		#print "response:$http_response";
 
 		if ($http_code != "302") {
 			die("[ERROR] Wrong oauth authorization response code: $http_code");
@@ -164,7 +164,10 @@
 		curl_setopt ( $ch, CURLOPT_URL, $SYNERGIA_SCHEDULE_URL );
 		curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt ( $ch, CURLOPT_TIMEOUT, $timeout );
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Cookie: DZIENNIKSID=$synergia_session_id"));
+        $DZIENNIKSID=$synergia_session_id;
+        $SDZIENNIKSID=explode("~", $synergia_session_id)[1];
+        #echo "DZIENNIKSID=$DZIENNIKSID; SDZIENNIKSID=$SDZIENNIKSID<br/>\n";
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Cookie: DZIENNIKSID=$DZIENNIKSID; SDZIENNIKSID=$SDZIENNIKSID"));
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			curl_setopt($ch, CURLOPT_POST, 1);
@@ -193,7 +196,7 @@
 	#print "authorization_code: $authorization_code <br/>";
 
 	$synergia_session_id = get_synergia_session_id($authorization_code);
-	#print "synergia_session_id: $synergia_session_id <br/>";
+	#print "DZIENNIKSID=$synergia_session_id<br/>";
 
 	$schedule = get_schedule($synergia_session_id);
 	$schedule = str_replace('src="/', 'src="https://synergia.librus.pl/', $schedule);
