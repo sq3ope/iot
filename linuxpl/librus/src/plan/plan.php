@@ -33,7 +33,7 @@
 		#var_dump($cookies);
 
 		if (!array_key_exists("DZIENNIKSID",$cookies)) {
-			die("[ERROR] DZIENNIKSID cookie missing");	
+			die("[ERROR] DZIENNIKSID cookie missing");
 		}
 
 		curl_close( $ch );
@@ -50,7 +50,7 @@
 		curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt ( $ch, CURLOPT_TIMEOUT, $timeout );
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			"Cookie: DZIENNIKSID=$librus_session_id", 
+			"Cookie: DZIENNIKSID=$librus_session_id",
 			'Content-Type: application/x-www-form-urlencoded'));
 		curl_setopt($ch, CURLOPT_POSTFIELDS, "action=login&login=$login&pass=$password");
 		$http_response = curl_exec($ch);
@@ -68,11 +68,11 @@
 		}
 
 		if (!array_key_exists("status", $json)) {
-			die("[ERROR] status field missing");	
+			die("[ERROR] status field missing");
 		}
 
 		if ($json['status'] != "ok") {
-			die("[ERROR] Wrong status: " . $json['status']);		
+			die("[ERROR] Wrong status: " . $json['status']);
 		}
 
 		curl_close( $ch );
@@ -108,11 +108,11 @@
 		$url = $matches[1];
 		#print "url: $url";
 
-		$url_components = parse_url($url); 
+		$url_components = parse_url($url);
 		parse_str($url_components['query'], $params);
 
 		if (!array_key_exists("code", $params)) {
-			die("[ERROR] 'code' parameter missing");	
+			die("[ERROR] 'code' parameter missing");
 		}
 
 		curl_close( $ch );
@@ -149,7 +149,7 @@
 		#var_dump($cookies);
 
 		if (!array_key_exists("DZIENNIKSID",$cookies)) {
-			die("[ERROR] DZIENNIKSID cookie missing");	
+			die("[ERROR] DZIENNIKSID cookie missing");
 		}
 
 		curl_close( $ch );
@@ -164,8 +164,9 @@
 		curl_setopt ( $ch, CURLOPT_URL, $SYNERGIA_SCHEDULE_URL );
 		curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt ( $ch, CURLOPT_TIMEOUT, $timeout );
-        $DZIENNIKSID=$synergia_session_id;
-        $SDZIENNIKSID=explode("~", $synergia_session_id)[1];
+        $DZIENNIKSID = $synergia_session_id;
+        $exploded_sid = explode("~", $synergia_session_id);
+        $SDZIENNIKSID = $exploded_sid[1];
         #echo "DZIENNIKSID=$DZIENNIKSID; SDZIENNIKSID=$SDZIENNIKSID<br/>\n";
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Cookie: DZIENNIKSID=$DZIENNIKSID; SDZIENNIKSID=$SDZIENNIKSID"));
 
